@@ -2,3 +2,11 @@
 
 Check the [wiki](https://github.com/graphstream/gs-netlogo/wiki) for more information about this extension.
 
+## Building
+
+Use the netlogo-6.3.0.jar.url environment variable to tell sbt which NetLogo.jar to compile against (defaults to NetLogo 6.3). For example:
+
+    sbt -Dnetlogo-6.3.0.jar.url=file://"/home/.../Desktop/NetLogo 6.3.0/lib/app/netlogo-6.3.0.jar" package
+
+If compilation succeeds, `gs.jar` will be created.
+
