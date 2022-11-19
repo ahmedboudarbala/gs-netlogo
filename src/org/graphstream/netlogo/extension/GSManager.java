@@ -1,5 +1,6 @@
 package org.graphstream.netlogo.extension;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,11 +17,13 @@ import org.graphstream.netlogo.extension.sender.Clear;
 import org.graphstream.netlogo.extension.sender.Remove;
 import org.graphstream.netlogo.extension.sender.RemoveAttribute;
 import org.graphstream.netlogo.extension.sender.Step;
+
 import org.graphstream.stream.sync.SinkTime;
 import org.graphstream.stream.sync.SourceTime;
 import org.nlogo.api.DefaultClassManager;
 import org.nlogo.api.ExtensionException;
 import org.nlogo.api.PrimitiveManager;
+
 
 /**
  * This is the main extension class.
@@ -90,7 +93,7 @@ public class GSManager extends DefaultClassManager {
 		senders.put(senderId, sender);
 	}
 
-	public static void clearSenders() throws ExtensionException {
+	public static void clearSenders() throws ExtensionException, InterruptedException, IOException {
 		for (GSSender sender : senders.values())
 			sender.close();
 		senders.clear();
@@ -115,7 +118,7 @@ public class GSManager extends DefaultClassManager {
 		receivers.put(receiverId, receiver);
 	}
 
-	public static void clearReceivers() {
+	public static void clearReceivers() throws InterruptedException {
 		for (GSReceiver receiver : receivers.values())
 			receiver.close();
 		receivers.clear();

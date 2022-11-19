@@ -3,7 +3,7 @@ package org.graphstream.netlogo.extension.receiver;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nlogo.api.LogoList;
+import org.nlogo.core.LogoList;
 import org.nlogo.api.LogoListBuilder;
 
 /**
@@ -61,6 +61,7 @@ public class Attributes {
 			return o;
 		if (o instanceof Number) {
 			return new Double(((Number) o).doubleValue());
+			
 		}
 		return null;
 	}

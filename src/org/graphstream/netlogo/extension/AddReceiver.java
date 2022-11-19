@@ -1,14 +1,16 @@
 package org.graphstream.netlogo.extension;
 
+
 import java.util.HashSet;
 import java.util.Set;
 
 import org.nlogo.api.Argument;
 import org.nlogo.api.Context;
-import org.nlogo.api.DefaultCommand;
+import org.nlogo.api.Command;
 import org.nlogo.api.ExtensionException;
 import org.nlogo.api.LogoException;
-import org.nlogo.api.Syntax;
+import org.nlogo.core.Syntax;
+import org.nlogo.core.SyntaxJ;
 
 /**
  * Implements the {@code add-receiver} command.
@@ -21,15 +23,15 @@ import org.nlogo.api.Syntax;
  * @author Stefan Balev
  *
  */
-public class AddReceiver extends DefaultCommand {
-	@Override
+public class AddReceiver implements Command {
+	
 	public String getAgentClassString() {
 		return "O";
 	}
 
 	@Override
 	public Syntax getSyntax() {
-		return Syntax.commandSyntax(
+		return SyntaxJ.commandSyntax(
 				new int[] { Syntax.StringType(), Syntax.StringType(),
 						Syntax.NumberType(),
 						Syntax.StringType() | Syntax.RepeatableType() }, 3);

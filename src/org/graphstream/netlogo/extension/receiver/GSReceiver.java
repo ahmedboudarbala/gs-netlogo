@@ -1,6 +1,7 @@
 package org.graphstream.netlogo.extension.receiver;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -8,12 +9,17 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+//import org.graphstream.graph.Graph;
+//import org.graphstream.graph.implementations.DefaultGraph;
 import org.graphstream.stream.SinkAdapter;
-import org.graphstream.stream.netstream.NetStreamReceiver;
+import org.graphstream.stream.binary.ByteProxy;
+////import org.graphstream.stream.netstream.NetStreamReceiver;
+import org.graphstream.stream.netstream.NetStreamUtils;
 import org.graphstream.stream.sync.SinkTime;
 import org.graphstream.stream.thread.ThreadProxyPipe;
+//import org.graphstream.util.VerboseSink;
 import org.nlogo.api.ExtensionException;
-import org.nlogo.api.LogoList;
+import org.nlogo.core.LogoList;
 
 /**
  * A receiver.
@@ -26,7 +32,8 @@ import org.nlogo.api.LogoList;
  */
 public class GSReceiver extends SinkAdapter {
 	protected SinkTime sinkTime;
-	protected NetStreamReceiver nsReceiver;
+	//protected NetStreamReceiver nsReceiver;
+    protected ByteProxy client;
 	protected ThreadProxyPipe pipe;
 	protected Attributes graphAttributes;
 	protected Map<String, Attributes> nodeAttributes;
@@ -34,19 +41,22 @@ public class GSReceiver extends SinkAdapter {
 	protected Queue<Double> steps;
 	protected Set<String> attributeFilter;
 
-	public GSReceiver(SinkTime sinkTime, String host, int port,
-			Set<String> attributeFilter) throws ExtensionException {
+	public GSReceiver(SinkTime sinkTime, String host, int port,	Set<String> attributeFilter) throws ExtensionException {
 		this.sinkTime = sinkTime;
 		this.attributeFilter = attributeFilter;
 		try {
-			nsReceiver = new NetStreamReceiver(host, port);
+            client = new ByteProxy(NetStreamUtils.getDefaultNetStreamFactory(), ByteProxy.Mode.CLIENT,InetAddress.getLocalHost(), port);
+			//nsReceiver = new NetStreamReceiver(host, port);
 		} catch (UnknownHostException e) {
 			throw new ExtensionException(e.getMessage());
 		} catch (IOException e) {
 			throw new ExtensionException(e.getMessage());
 		}
-		pipe = nsReceiver.getDefaultStream();
-		pipe.addSink(this);
+        client.start();
+		//pipe = nsReceiver.getDefaultStream();
+        //pipe = client.
+        client.addSink(this);
+		
 		graphAttributes = new Attributes();
 		nodeAttributes = new HashMap<String, Attributes>();
 		edgeAttributes = new HashMap<String, Attributes>();
@@ -54,19 +64,19 @@ public class GSReceiver extends SinkAdapter {
 	}
 
 	public LogoList receiveGraphAttribute(String attribute) {
-		pipe.pump();
+		
 		return graphAttributes.get(attribute);
 	}
 
 	public LogoList receiveNodeAttribute(long nodeId, String attribute) {
-		pipe.pump();
+		
 		Attributes a = nodeAttributes.get(nodeId + "");
 		return a == null ? LogoList.Empty() : a.get(attribute);
 	}
 
 	public LogoList receiveEdgeAttribute(long fromId, long toId,
 			String attribute) {
-		pipe.pump();
+		
 		Attributes a = edgeAttributes.get(fromId + "_" + toId);
 		return a == null ? LogoList.Empty() : a.get(attribute);
 	}
@@ -82,15 +92,16 @@ public class GSReceiver extends SinkAdapter {
 	}
 
 	public void flush() {
-		pipe.pump();
+		
 		graphAttributes = new Attributes();
 		nodeAttributes.clear();
 		edgeAttributes.clear();
 		steps.clear();
 	}
 
-	public void close() {
-		nsReceiver.quit();
+	public void close() throws InterruptedException {
+        client.stop();
+		//nsReceiver.quit();
 	}
 
 	// Sink methods

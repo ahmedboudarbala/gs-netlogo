@@ -4,12 +4,13 @@ import org.graphstream.netlogo.extension.GSManager;
 import org.nlogo.api.Agent;
 import org.nlogo.api.Argument;
 import org.nlogo.api.Context;
-import org.nlogo.api.DefaultReporter;
+import org.nlogo.api.Reporter;
 import org.nlogo.api.ExtensionException;
 import org.nlogo.api.Link;
 import org.nlogo.api.LogoException;
 import org.nlogo.api.Observer;
-import org.nlogo.api.Syntax;
+import org.nlogo.core.Syntax;
+import org.nlogo.core.SyntaxJ;
 import org.nlogo.api.Turtle;
 
 /**
@@ -22,15 +23,15 @@ import org.nlogo.api.Turtle;
  * @author Stefan Balev
  * 
  */
-public class GetAttribute extends DefaultReporter {
-	@Override
+public class GetAttribute implements Reporter {
+	
 	public String getAgentClassString() {
 		return "OTL";
 	}
 
 	@Override
 	public Syntax getSyntax() {
-		return Syntax.reporterSyntax(
+		return SyntaxJ.reporterSyntax(
 				new int[] { Syntax.StringType(), Syntax.StringType() },
 				Syntax.ListType());
 	}
@@ -56,6 +57,7 @@ public class GetAttribute extends DefaultReporter {
 		} catch (LogoException e) {
 			throw new ExtensionException(e.getMessage());
 		}
+        
 	}
 
 }

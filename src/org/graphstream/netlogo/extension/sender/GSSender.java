@@ -1,9 +1,12 @@
 package org.graphstream.netlogo.extension.sender;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.graphstream.stream.netstream.NetStreamSender;
+import org.graphstream.stream.binary.ByteProxy;
+//import org.graphstream.stream.netstream.NetStreamSender;
+import org.graphstream.stream.netstream.NetStreamUtils;
 import org.graphstream.stream.sync.SourceTime;
 import org.nlogo.api.ExtensionException;
 
@@ -19,83 +22,78 @@ import org.nlogo.api.ExtensionException;
 public class GSSender {
 	protected String sourceId;
 	protected SourceTime sourceTime;
-	protected NetStreamSender nsSender;
+	//protected NetStreamSender nsSender;
+    protected ByteProxy client;
 
-	public GSSender(String sourceId, SourceTime sourceTime, String host,
-			int port) throws ExtensionException {
+	public GSSender(String sourceId, SourceTime sourceTime, String host,int port) throws ExtensionException {
 		this.sourceId = sourceId;
 		this.sourceTime = sourceTime;
 		try {
-			nsSender = new NetStreamSender(host, port);
+            client = new ByteProxy(NetStreamUtils.getDefaultNetStreamFactory(), ByteProxy.Mode.CLIENT,InetAddress.getLocalHost(), port);
+			//nsSender = new NetStreamSender(host, port);
 		} catch (UnknownHostException e) {
 			throw new ExtensionException(e.getMessage());
 		} catch (IOException e) {
 			throw new ExtensionException(e.getMessage());
 		}
+        //client.start();
+		//client.run();
 	}
 
 	public void sendNodeAdded(long nodeId) {
-		nsSender.nodeAdded(sourceId, newEvent(), nodeId + "");
+		client.nodeAdded(sourceId, newEvent(), nodeId + "");
 	}
 
 	public void sendEdgeAdded(long fromId, long toId, boolean directed) {
-		nsSender.edgeAdded(sourceId, newEvent(), fromId + "_" + toId, fromId
+		client.edgeAdded(sourceId, newEvent(), fromId + "_" + toId, fromId
 				+ "", toId + "", directed);
 	}
 
 	public void sendNodeRemoved(long nodeId) {
-		nsSender.nodeRemoved(sourceId, newEvent(), nodeId + "");
+		client.nodeRemoved(sourceId, newEvent(), nodeId + "");
 	}
 
 	public void sendEdgeRemoved(long fromId, long toId) {
-		nsSender.edgeRemoved(sourceId, newEvent(), fromId + "_" + toId);
+		client.edgeRemoved(sourceId, newEvent(), fromId + "_" + toId);
 	}
 
 	public void sendGraphAttributeAdded(String attribute, Object value) {
-		nsSender.graphAttributeAdded(sourceId, newEvent(), attribute, value);
+		client.graphAttributeAdded(sourceId, newEvent(), attribute, value);
 	}
 
-	public void sendNodeAttributeAdded(long nodeId, String attribute,
-			Object value) {
-		nsSender.nodeAttributeAdded(sourceId, newEvent(), nodeId + "",
-				attribute, value);
+	public void sendNodeAttributeAdded(long nodeId, String attribute,Object value) {
+		client.nodeAttributeAdded(sourceId, newEvent(), nodeId + "", attribute, value);
 	}
 
-	public void sendEdgeAttributeAdded(long fromId, long toId,
-			String attribute, Object value) {
-		nsSender.edgeAttributeAdded(sourceId, newEvent(), fromId + "_" + toId,
-				attribute, value);
+	public void sendEdgeAttributeAdded(long fromId, long toId, String attribute, Object value) {
+		client.edgeAttributeAdded(sourceId, newEvent(), fromId + "_" + toId, attribute, value);
 	}
 
 	public void sendGraphAttributeRemoved(String attribute) {
-		nsSender.graphAttributeRemoved(sourceId, newEvent(), attribute);
+		client.graphAttributeRemoved(sourceId, newEvent(), attribute);
 	}
 
 	public void sendNodeAttributeRemoved(long nodeId, String attribute) {
-		nsSender.nodeAttributeRemoved(sourceId, newEvent(), nodeId + "",
+		client.nodeAttributeRemoved(sourceId, newEvent(), nodeId + "",
 				attribute);
 	}
 
 	public void sendEdgeAttributeRemoved(long fromId, long toId,
 			String attribute) {
-		nsSender.edgeAttributeRemoved(sourceId, newEvent(),
+		client.edgeAttributeRemoved(sourceId, newEvent(),
 				fromId + "_" + toId, attribute);
 	}
 
 	public void sendGraphCleared() {
-		nsSender.graphCleared(sourceId, newEvent());
+		client.graphCleared(sourceId, newEvent());
 	}
 
 	public void sendStepBegins(double step) {
-		nsSender.stepBegins(sourceId, newEvent(), step);
+		client.stepBegins(sourceId, newEvent(), step);
 	}
 
-	public void close() throws ExtensionException {
-		try {
-			nsSender.close();
-		} catch (IOException e) {
-			throw new ExtensionException(e.getMessage());
-		}
+	public void close() throws ExtensionException, InterruptedException, IOException {
+		client.stop();
 	}
 
 	protected long newEvent() {

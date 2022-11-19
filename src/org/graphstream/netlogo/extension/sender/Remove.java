@@ -1,14 +1,16 @@
 package org.graphstream.netlogo.extension.sender;
 
+
 import org.graphstream.netlogo.extension.GSManager;
 import org.nlogo.api.Agent;
 import org.nlogo.api.Argument;
 import org.nlogo.api.Context;
-import org.nlogo.api.DefaultCommand;
+import org.nlogo.api.Command;
 import org.nlogo.api.ExtensionException;
 import org.nlogo.api.Link;
 import org.nlogo.api.LogoException;
-import org.nlogo.api.Syntax;
+import org.nlogo.core.Syntax;
+import org.nlogo.core.SyntaxJ;
 import org.nlogo.api.Turtle;
 
 /**
@@ -21,16 +23,16 @@ import org.nlogo.api.Turtle;
  * @author Stefan
  *
  */
-public class Remove extends DefaultCommand {
+public class Remove implements Command {
 
-	@Override
+	
 	public String getAgentClassString() {
 		return "TL";
 	}
 
 	@Override
 	public Syntax getSyntax() {
-		return Syntax.commandSyntax(new int[] { Syntax.StringType() });
+		return SyntaxJ.commandSyntax(new int[] { Syntax.StringType() });
 	}
 
 	@Override
@@ -52,3 +54,4 @@ public class Remove extends DefaultCommand {
 	}
 
 }
+
